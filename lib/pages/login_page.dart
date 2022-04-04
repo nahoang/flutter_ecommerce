@@ -1,35 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatefulWidget {
+class LoginPage extends StatefulWidget {
 
   @override
-  RegisterPageState createState() => RegisterPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class RegisterPageState extends State<RegisterPage> {
+class LoginPageState extends State<LoginPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String? _username, _email, _password;
+  bool _obscureText = true;
+
+  String? _email, _password;
 
   Widget _showTitle() {
-    return Text('Register', style: Theme.of(context).textTheme.headline1);
-  }
-
-  Widget _showUsernameInput() {
-    return Padding(
-      padding: EdgeInsets.only(top: 20.0),
-      child: TextFormField(
-        onSaved: (val) => _username = val,
-        validator: (val) => (val?.length ?? 0) < 6 ? 'Username too short' : null,
-        decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Username',
-            hintText: 'Enter username, min length 6',
-            icon: Icon(Icons.face, color: Colors.grey)),
-      ),
-    );
+    return Text('Login', style: Theme.of(context).textTheme.headline1);
   }
 
   Widget _showEmailInput() {
@@ -51,10 +38,18 @@ class RegisterPageState extends State<RegisterPage> {
     return Padding(
       padding: EdgeInsets.only(top: 20.0),
       child: TextFormField(
-        obscureText: true,
+        obscureText: _obscureText,
         onSaved: (val) => _password = val,
         validator: (val) => (val?.length ?? 0) < 6 ? 'Password too short' : null,
         decoration: InputDecoration(
+            suffixIcon: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
+              child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off)
+            ),
             border: OutlineInputBorder(),
             labelText: 'Password',
             hintText: 'Enter password, min length 6',
@@ -85,9 +80,9 @@ class RegisterPageState extends State<RegisterPage> {
                 color: Theme.of(context).primaryColor),
             FlatButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');
+                  Navigator.pushReplacementNamed(context, '/register');
                 },
-                child: Text('Existing user?, Login'))
+                child: Text('New user?, Register'))
           ],
         ));
   }
@@ -97,7 +92,6 @@ class RegisterPageState extends State<RegisterPage> {
 
     if (form!.validate()) {
       form.save();
-      print('Usernam: $_username, email: $_email, password: $_password');
     }
   }
 
@@ -105,22 +99,21 @@ class RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-        appBar: AppBar(title: Text('Register')),
+        appBar: AppBar(title: Text('Login')),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20.0),
           child: Center(
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
+                    key: _formKey,
                     child: Column(
-              children: [
-                _showTitle(),
-                _showUsernameInput(),
-                _showEmailInput(),
-                _showPasswordInput(),
-                _showFormActions(),
-              ],
-            ))),
+                      children: [
+                        _showTitle(),
+                        _showEmailInput(),
+                        _showPasswordInput(),
+                        _showFormActions(),
+                      ],
+                    ))),
           ),
         ));
   }
