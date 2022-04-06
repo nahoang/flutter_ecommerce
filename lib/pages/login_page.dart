@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
 
@@ -9,9 +11,14 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
 
+  final _scalffoldKey = GlobalKey<ScaffoldState>();
+
   final _formKey = GlobalKey<FormState>();
 
   bool _obscureText = true;
+
+  bool _isSubmitting = false;
+
 
   String? _email, _password;
 
@@ -63,7 +70,9 @@ class LoginPageState extends State<LoginPage> {
         padding: EdgeInsets.only(top: 20.0),
         child: Column(
           children: [
-            RaisedButton(
+            _isSubmitting == true ? CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+            ) : RaisedButton(
                 onPressed: () {
                   // print('submit');
                   _submit();
@@ -87,11 +96,76 @@ class LoginPageState extends State<LoginPage> {
         ));
   }
 
+
+  void _registerUser() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+    var url = Uri.parse('http://localhost:1337/auth/local');
+    http.Response response = await http.post(url, body: {
+      "identifier": _email,
+      "password": _password
+    });
+
+    final responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      _showSuccessSnack();
+
+      _redirectUser();
+      print(responseData);
+    } else {
+      setState(() {
+        _isSubmitting = false;
+      });
+      final String errorMsg = responseData['message'];
+      _showErrorSnack(errorMsg);
+    }
+
+  }
+
+
+  void _showErrorSnack(String errorMsg) {
+    final snackbar = SnackBar(
+      content: Text(errorMsg, style: TextStyle(
+          color: Colors.red
+      )),
+    );
+
+    _scalffoldKey.currentState?.showSnackBar(snackbar);
+    throw Exception('Error login: $errorMsg');
+  }
+
+  void _redirectUser() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/products');
+    });
+
+  }
+
+  void _showSuccessSnack() {
+    final snackbar = SnackBar(
+      content: Text('User login successfully!', style: TextStyle(
+          color: Colors.green
+      )),
+    );
+
+    _scalffoldKey.currentState?.showSnackBar(snackbar);
+
+    _formKey.currentState?.reset();
+  }
+
+
   void _submit() {
     final form = _formKey.currentState;
 
     if (form!.validate()) {
       form.save();
+      _registerUser();
     }
   }
 
@@ -99,6 +173,7 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+        key: _scalffoldKey,
         appBar: AppBar(title: Text('Login')),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20.0),
