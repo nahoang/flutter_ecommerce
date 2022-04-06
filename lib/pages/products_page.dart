@@ -9,6 +9,6 @@ class ProductsPage extends StatefulWidget {
 class _ProductsPageState extends State<ProductsPage> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Text('Products Page');
   }
 }

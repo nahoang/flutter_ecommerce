@@ -121,12 +121,42 @@ class RegisterPageState extends State<RegisterPage> {
     });
 
     final responseData = json.decode(response.body);
-    setState(() {
-      _isSubmitting = false;
+    if (response.statusCode == 200) {
+
+      setState(() {
+        _isSubmitting = false;
+      });
+
+      _showSuccessSnack();
+
+      _redirectUser();
+      print(responseData);
+    } else {
+      setState(() {
+        _isSubmitting = false;
+      });
+      final String errorMsg = responseData['message'];
+      _showErrorSnack(errorMsg);
+    }
+
+  }
+
+  void _showErrorSnack(String errorMsg) {
+    final snackbar = SnackBar(
+      content: Text(errorMsg, style: TextStyle(
+          color: Colors.red
+      )),
+    );
+
+    _scalffoldKey.currentState?.showSnackBar(snackbar);
+    throw Exception('Error registering: $errorMsg');
+  }
+
+  void _redirectUser() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/products');
     });
 
-    _showSuccessSnack();
-    print(responseData);
   }
 
   void _showSuccessSnack() {
