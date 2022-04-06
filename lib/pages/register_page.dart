@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class RegisterPage extends StatefulWidget {
 
@@ -9,7 +12,10 @@ class RegisterPage extends StatefulWidget {
 
 class RegisterPageState extends State<RegisterPage> {
 
+  final _scalffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
+
+  bool _isSubmitting = false, _obscureText = true;
 
   String? _username, _email, _password;
 
@@ -68,7 +74,9 @@ class RegisterPageState extends State<RegisterPage> {
         padding: EdgeInsets.only(top: 20.0),
         child: Column(
           children: [
-            RaisedButton(
+           _isSubmitting == true ? CircularProgressIndicator(
+             valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+           ) : RaisedButton(
                 onPressed: () {
                   // print('submit');
                   _submit();
@@ -97,14 +105,47 @@ class RegisterPageState extends State<RegisterPage> {
 
     if (form!.validate()) {
       form.save();
-      print('Usernam: $_username, email: $_email, password: $_password');
+      _registerUser();
     }
+  }
+
+  void _registerUser() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+    var url = Uri.parse('http://localhost:1337/auth/local/register');
+    http.Response response = await http.post(url, body: {
+      "username": _username,
+      "email": _email,
+      "password": _password
+    });
+
+    final responseData = json.decode(response.body);
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    _showSuccessSnack();
+    print(responseData);
+  }
+
+  void _showSuccessSnack() {
+    final snackbar = SnackBar(
+      content: Text('User $_username successfully created!', style: TextStyle(
+        color: Colors.green
+      )),
+    );
+
+    _scalffoldKey.currentState?.showSnackBar(snackbar);
+
+    _formKey.currentState?.reset();
   }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
+        key: _scalffoldKey,
         appBar: AppBar(title: Text('Register')),
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 20.0),
