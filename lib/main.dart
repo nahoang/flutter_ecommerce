@@ -2,18 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ecommerce/pages/login_page.dart';
 import 'package:flutter_ecommerce/pages/products_page.dart';
 import 'package:flutter_ecommerce/pages/register_page.dart';
+import 'package:flutter_ecommerce/redux/reducers.dart';
+import 'package:flutter_ecommerce/models/app_state.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  final store = Store<AppState>(appReducer, initialState: AppState.initial(),
+    middleware: [thunkMiddleware]);
+  runApp(MyApp(store: store));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+
+  final Store<AppState> store;
+
+  MyApp({ required this.store });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return StoreProvider(store: store,
+        child: MaterialApp(
       title: 'Flutter Ecommerce',
       routes: {
         '/products': (BuildContext context) => ProductsPage(),
@@ -30,8 +42,8 @@ class MyApp extends StatelessWidget {
             bodyText1: TextStyle(fontSize: 18.0)
           )
       ),
-      home: ProductsPage()
-    );
+      home: RegisterPage()
+    ));
   }
 }
 
