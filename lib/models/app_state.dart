@@ -1,4 +1,5 @@
 
+import 'package:flutter_ecommerce/models/user.dart';
 import 'package:meta/meta.dart';
 
 @immutable

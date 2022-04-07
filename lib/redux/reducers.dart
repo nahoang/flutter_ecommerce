@@ -1,16 +1,18 @@
 
+import 'dart:convert';
+
 import 'package:flutter_ecommerce/models/app_state.dart';
 import 'package:flutter_ecommerce/redux/actions.dart';
 
-AppState appReducer(state, action) {
+import '../models/user.dart';
+
+AppState appReducer(AppState state, dynamic action) {
   return AppState(
-    user: userReducer(
-      state.user, action
-    )
+    user: userReducer(state.user, action)
   );
 }
 
-userReducer(user, action) {
+User userReducer(user, dynamic action) {
   if (action is GetUserAction) {
     return action.user;
   }

@@ -33,7 +33,11 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, AppState>(builder: (context, state) =>
-         Text(json.encode(state.user)), converter: (store) => store.state);
+    return StoreConnector<AppState, AppState>(
+        converter: (store) => store.state,
+        builder: (context, state) => state.user != null ? Text(state.user.username) : Text(
+          'No data'
+        ),
+       );
   }
 }
