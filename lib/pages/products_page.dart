@@ -5,6 +5,8 @@ import 'package:flutter_ecommerce/models/app_state.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../widgets/product_item.dart';
+
 
 final gradientBackground = BoxDecoration(
   gradient: LinearGradient(
@@ -40,8 +42,6 @@ class _ProductsPageState extends State<ProductsPage> {
   _getUser() async {
     final prefs = await SharedPreferences.getInstance();
     var storedUser = prefs.getString('user');
-
-    print(json.decode(storedUser!));
   }
 
   final _appBar = PreferredSize(
@@ -77,14 +77,28 @@ class _ProductsPageState extends State<ProductsPage> {
         appBar: _appBar, body:
           Container(
               decoration: gradientBackground,
-              child: Column(
-                children: [
-                  Row(
+              child: StoreConnector<AppState, AppState>(
+                converter: (store) => store.state,
+                builder: (_, state) {
+                  return Column(
                     children: [
-                      Text('Products Page'),
+                      Expanded(
+                          child: SafeArea(
+                            top: false,
+                            bottom: false,
+                            child: GridView.builder(
+                              itemCount: state.products.length,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2
+                              ),
+                              itemBuilder: (context, i) => ProductItem(item: state.products[i]),
+                            )
+                          )
+                      )
                     ],
-                  ),
-                ],
-              )));
+                  );
+                },
+              )
+          ));
   }
 }

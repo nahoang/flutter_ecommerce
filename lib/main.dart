@@ -10,6 +10,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 
+
 void main() {
   final store = Store<AppState>(appReducer, initialState: AppState.initial(),
     middleware: [thunkMiddleware]);
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         '/products': (BuildContext context) => ProductsPage(
           onInit: () {
             StoreProvider.of<AppState>(context).dispatch(getUserAction);
-            //dispatch an action to get user information
+            StoreProvider.of<AppState>(context).dispatch(getProductsAction);
           }
         ),
         '/login': (BuildContext context) => LoginPage(),
